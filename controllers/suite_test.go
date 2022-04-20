@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	metalv1beta1 "metalnode/api/v1beta1"
+	metalv1beta1 "github.com/git-czy/cluster-api-metalnode/api/v1beta1"
 	//+kubebuilder:scaffold:imports
 )
 
