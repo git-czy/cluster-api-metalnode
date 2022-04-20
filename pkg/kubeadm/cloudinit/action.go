@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"metalnode/pkg/remote"
+	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
 	"regexp"
 	"strings"
 )

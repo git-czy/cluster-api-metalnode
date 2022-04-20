@@ -18,17 +18,17 @@ package controllers
 
 import (
 	"context"
+	"github.com/git-czy/cluster-api-metalnode/api/v1beta1"
+	"github.com/git-czy/cluster-api-metalnode/pkg/kubeadm/cloudinit"
+	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"metalnode/api/v1beta1"
-	"metalnode/pkg/kubeadm/cloudinit"
-	"metalnode/pkg/remote"
 
-	util "metalnode/utils"
-	"metalnode/utils/log"
+	util "github.com/git-czy/cluster-api-metalnode/utils"
+	"github.com/git-czy/cluster-api-metalnode/utils/log"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

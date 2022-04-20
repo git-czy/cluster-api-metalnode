@@ -2,8 +2,8 @@ package remote
 
 import (
 	"fmt"
+	"github.com/git-czy/cluster-api-metalnode/utils/log"
 	"io"
-	"metalnode/utils/log"
 	"os"
 	"path"
 

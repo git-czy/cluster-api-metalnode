@@ -9,7 +9,7 @@ import (
 
 	gossh "golang.org/x/crypto/ssh"
 
-	"metalnode/utils/log"
+	"github.com/git-czy/cluster-api-metalnode/utils/log"
 )
 
 type ssh struct {

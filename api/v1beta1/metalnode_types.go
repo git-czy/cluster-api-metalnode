@@ -18,8 +18,8 @@ package v1beta1
 
 import (
 	"fmt"
+	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"metalnode/pkg/remote"
 	"net"
 	"strings"
 )

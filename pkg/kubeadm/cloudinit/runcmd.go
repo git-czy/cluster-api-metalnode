@@ -1,7 +1,7 @@
 package cloudinit
 
 import (
-	"metalnode/pkg/remote"
+	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
 	"sigs.k8s.io/yaml"
 )
 
