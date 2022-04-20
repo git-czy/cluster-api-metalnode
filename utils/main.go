@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	remote2 "metalnode/pkg/remote"
+	remote2 "github.com/git-czy/cluster-api-metalnode/pkg/remote"
 )
 
 func main() {

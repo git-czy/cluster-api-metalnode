@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	metalv1beta1 "metalnode/api/v1beta1"
-	"metalnode/controllers"
+	metalv1beta1 "github.com/git-czy/cluster-api-metalnode/api/v1beta1"
+	"github.com/git-czy/cluster-api-metalnode/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
