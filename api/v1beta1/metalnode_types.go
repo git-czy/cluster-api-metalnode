@@ -142,7 +142,7 @@ func (mn *MetalNode) SetRole(role string) {
 	mn.Status.Role = append(mn.Status.Role, role)
 }
 
-func (mn *MetalNode) hasRole(role string) bool {
+func (mn *MetalNode) HasRole(role string) bool {
 	return utils.SliceContainsString(mn.Status.Role, role)
 }
 
