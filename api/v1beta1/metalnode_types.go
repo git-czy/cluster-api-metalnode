@@ -19,6 +19,7 @@ package v1beta1
 import (
 	"fmt"
 	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
+	"github.com/git-czy/cluster-api-metalnode/utils"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"net"
 	"strings"
@@ -139,6 +140,10 @@ type MetalNode struct {
 // SetRole set MetalNode status role
 func (mn *MetalNode) SetRole(role string) {
 	mn.Status.Role = append(mn.Status.Role, role)
+}
+
+func (mn *MetalNode) hasRole(role string) bool {
+	return utils.SliceContainsString(mn.Status.Role, role)
 }
 
 // GetRefCluster get MetalNode status refCluster

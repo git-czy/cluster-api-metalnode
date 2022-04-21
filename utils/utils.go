@@ -9,3 +9,15 @@ func SliceRemoveString(slice []string, s string) (result []string) {
 	}
 	return
 }
+
+func SliceContainsString(slice []string, s string) bool {
+	if slice == nil {
+		return false
+	}
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
