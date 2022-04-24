@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-type CLi struct {
+type Cli struct {
 	User     string
 	Password string
 	SSHKey   string
@@ -17,10 +17,12 @@ type CLi struct {
 	log      log.Logger
 }
 
-func (c CLi) Fields() (string, string, string, int, string, log.Logger) {
+func (c Cli) Fields() (string, string, string, int, string, log.Logger) {
 	return c.User, c.Password, c.Address, c.Port, c.SSHKey, c.log
 }
 
+// Run supports executing commands and uploading files on the remote hosts
+// return a map contains the standard stderr,and the map key is remote host ip
 func Run(hosts []Host, cmd Command) map[string][]string {
 	stopChan := make(chan bool)
 	stderrsChan := make(chan map[string][]string)
@@ -83,7 +85,7 @@ func run(h Host, cmd Command, stopChan chan bool, stderrsChan chan map[string][]
 }
 
 // NewRemoteClient 新建远程客户端
-func NewRemoteClient(h *Host) (*CLi, error) {
+func NewRemoteClient(h *Host) (*Cli, error) {
 	var err error
 
 	h, err = h.Validate()
@@ -100,7 +102,7 @@ func NewRemoteClient(h *Host) (*CLi, error) {
 
 	l.Info("New RemoteClient ....")
 
-	c := &CLi{
+	c := &Cli{
 		User:     h.User,
 		Password: h.Password,
 		SSHKey:   h.SSHKey,
@@ -129,7 +131,7 @@ func NewRemoteClient(h *Host) (*CLi, error) {
 }
 
 // CloseRemoteCli 关闭远程客户端
-func (c *CLi) CloseRemoteCli(stopChan chan bool) {
+func (c *Cli) CloseRemoteCli(stopChan chan bool) {
 
 	if err := c.SFTP.sftpClient.Close(); err != nil && err != io.EOF {
 		c.SFTP.log.WithError(err).Infoln("Some errors happened when sftp client closed")

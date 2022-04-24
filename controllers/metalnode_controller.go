@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/git-czy/cluster-api-metalnode/api/v1beta1"
 	"github.com/git-czy/cluster-api-metalnode/pkg/kubeadm/cloudinit"
 	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
@@ -47,9 +48,10 @@ type MetalNodeReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=metal.metal.node,resources=metalnodes,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=metal.metal.node,resources=metalnodes/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=metal.metal.node,resources=metalnodes/finalizers,verbs=update
+//+kubebuilder:rbac:groups=bocloud.io,resources=metalnodes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=bocloud.io,resources=metalnodes/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=bocloud.io,resources=metalnodes/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=secrets;,verbs=get;list;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -67,10 +69,11 @@ func (r *MetalNodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
+		log.WithError(err).Error("unable to fetch MetalNode")
 		return ctrl.Result{}, err
 	}
-	err := metalNode.Spec.NodeEndPoint.Validate()
-	if err != nil {
+
+	if err := metalNode.Spec.NodeEndPoint.Validate(); err != nil {
 		log.WithError(err).Errorln("Invalid metal node endpoint host")
 		return ctrl.Result{}, err
 	}
@@ -86,17 +89,6 @@ func (r *MetalNodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}()
 
-	if metalNode.Status.DataSecretName != "" && !metalNode.Status.Bootstrapped {
-		err := r.bootstrapMetalNode(ctx, metalNode)
-		if err != nil {
-			l.WithError(err).Errorln("failed to bootstrap metal node")
-			return ctrl.Result{}, err
-		}
-		metalNode.Status.Bootstrapped = true
-		l.Infoln("bootstrapped metal node successfully")
-		return ctrl.Result{}, err
-	}
-
 	// if metal node is INITIALIZING, do nothing
 	if metalNode.Status.InitializationState == INITIALIZING {
 		return ctrl.Result{}, nil
@@ -109,6 +101,8 @@ func (r *MetalNodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	if metalNode.Status.InitializationState == "" {
 		metalNode.Status.InitializationState = INITIALIZING
+		metalNode.Status.Bootstrapped = false
+		metalNode.Status.Ready = false
 		if err := r.Status().Update(ctx, metalNode); err != nil {
 			l.WithError(err).Errorln("failed to update metal node status")
 			return ctrl.Result{}, err
@@ -138,6 +132,21 @@ func (r *MetalNodeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
+	if metalNode.Status.DataSecretName != "" && !metalNode.Status.Bootstrapped {
+		err := r.bootstrapMetalNode(ctx, metalNode)
+		if err != nil {
+			l.WithError(err).Errorln("failed to bootstrap metal node")
+			return ctrl.Result{}, err
+		}
+		if err = r.checkMetalNodeBootstrap(ctx, metalNode); err != nil {
+			l.Error("failed to check metal node bootstrap")
+			return ctrl.Result{}, err
+		}
+		metalNode.Status.Bootstrapped = true
+		l.Infoln("bootstrapped metal node successfully")
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
@@ -153,13 +162,14 @@ func (r *MetalNodeReconciler) initMetal(ctx context.Context, metalNode *v1beta1.
 	host := metalNodeToHost(metalNode)
 	cmd := remote.Command{
 		Cmds: []string{
-			"sudo chmod +x /tmp/init_k8s_env.sh",
+			//"sudo chmod +x /tmp/init_k8s_env.sh",
 			"sudo sed -i 's/\\r//g' /tmp/init_k8s_env.sh",
-			"sudo /bin/bash /tmp/init_k8s_env.sh",
+			//"sudo /bin/bash /tmp/init_k8s_env.sh",
+			//"sudo hostnamectl set-hostname " + host[0].Address,
 		},
-		FileUp: []remote.File{
-			{Src: "script/init_k8s_env.sh", Dst: "/tmp"},
-		},
+		//FileUp: []remote.File{
+		//	{Src: "script/init_k8s_env.sh", Dst: "/tmp"},
+		//},
 	}
 
 	if metalNode.Spec.InitializationCmd != nil {
@@ -193,8 +203,15 @@ func (r *MetalNodeReconciler) checkMetalNodeInitialized(ctx context.Context, met
 
 	errs := remote.Run(host, cmd)
 
-	// almost impossible to get one err when run kubectl version,but we don't care about it'
-	checkErrs := util.SliceRemoveString(errs[metalNode.Spec.NodeEndPoint.Host], "The connection to the server localhost:8080 was refused - did you specify the right host or port?")
+	ignoreErrs := []string{
+		fmt.Sprintf("The connection to the server %s:6443 was refused - did you specify the right host or port?", host[0].Address),
+		fmt.Sprintf("The connection to the server %s:8080 was refused - did you specify the right host or port?", host[0].Address),
+		"The connection to the server localhost:6443 was refused - did you specify the right host or port?",
+		"The connection to the server localhost:8080 was refused - did you specify the right host or port?",
+	}
+
+	// it's possible to get one err when run kubectl version,but we don't care about it, because not bootstrap yet
+	checkErrs := util.SliceExcludeSlice(errs[metalNode.Spec.NodeEndPoint.Host], ignoreErrs)
 
 	if len(checkErrs) != 0 {
 		metalNode.Status.CheckFailureReason = checkErrs
@@ -220,6 +237,21 @@ func (r *MetalNodeReconciler) bootstrapMetalNode(ctx context.Context, metalNode 
 		if err := r.Status().Update(ctx, metalNode); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (r *MetalNodeReconciler) checkMetalNodeBootstrap(ctx context.Context, metalNode *v1beta1.MetalNode) error {
+	host := metalNodeToHost(metalNode)
+	cmd := remote.Command{
+		Cmds: remote.Commands{
+			"sudo cat /run/cluster-api/bootstrap-success.complete",
+		},
+	}
+	errs := remote.Run(host, cmd)
+
+	if len(errs[metalNode.Spec.NodeEndPoint.Host]) != 0 {
+		return errors.New("metal node bootstrap failed")
 	}
 	return nil
 }

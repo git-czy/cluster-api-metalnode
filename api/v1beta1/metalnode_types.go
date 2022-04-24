@@ -103,8 +103,7 @@ type MetalNodeStatus struct {
 	DataSecretName string `json:"dataSecretName,omitempty"`
 
 	// Bootstrapped denotes if this node is bootstrapped
-	// +optional
-	Bootstrapped bool `json:"bootstrapped,omitempty"`
+	Bootstrapped bool `json:"bootstrapped"`
 
 	// BootstrappedFailureReason denotes run bootstrap shell command standard stderr
 	BootstrapFailureReason []string `json:"bootstrapFailureReason,omitempty"`
@@ -127,6 +126,8 @@ func (e Endpoint) Validate() error {
 // +kubebuilder:resource:shortName=mn
 // +kubebuilder:printcolumn:name="READY",type="boolean",JSONPath=".status.ready"
 // +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.InitializationState"
+// +kubebuilder:printcolumn:name="ROLE",type="string",JSONPath=".status.Role"
+// +kubebuilder:printcolumn:name="CLUSTER",type="string",JSONPath=".status.RefCluster"
 
 // MetalNode is the Schema for the metalnodes API
 type MetalNode struct {

@@ -5,7 +5,7 @@ metadata:
 
 
 ---
-apiVersion: metal.metal.node/v1beta1
+apiVersion: bocloud.io/v1beta1
 kind: MetalNode
 metadata:
   name: metalnode-centos-148
@@ -24,7 +24,7 @@ spec:
 #      - "echo hello world"
 
 ---
-apiVersion: metal.metal.node/v1beta1
+apiVersion: bocloud.io/v1beta1
 kind: MetalNode
 metadata:
   name: metalnode-centos-147

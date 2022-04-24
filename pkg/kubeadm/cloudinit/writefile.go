@@ -65,7 +65,7 @@ func echoContentCmd(content string, path string, append bool) string {
 	if append {
 		return "echo '" + content + "' | sudo tee -a " + path
 	}
-	return "echo \"" + content + "\" | sudo tee " + path
+	return "echo '" + content + "' | sudo tee " + path
 }
 
 func joinPermissionsCmd(permissions string, path string) string {

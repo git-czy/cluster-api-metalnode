@@ -7,7 +7,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - metal.metal.node
+  - bocloud.io
   resources:
   - metalnodes
   verbs:
@@ -19,13 +19,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - metal.metal.node
+  - bocloud.io
   resources:
   - metalnodes/finalizers
   verbs:
   - update
 - apiGroups:
-  - metal.metal.node
+  - bocloud.io
   resources:
   - metalnodes/status
   verbs:

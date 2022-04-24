@@ -1,6 +1,7 @@
 package cloudinit
 
 import (
+	"fmt"
 	"github.com/git-czy/cluster-api-metalnode/pkg/remote"
 	"sigs.k8s.io/yaml"
 )
@@ -14,5 +15,9 @@ func (a *runCmdAction) Unmarshal(data []byte) error {
 }
 
 func (a *runCmdAction) Commands() (remote.Commands, error) {
-	return a.Cmds, nil
+	cmds := remote.Commands{}
+	for _, cmd := range a.Cmds {
+		cmds = append(cmds, fmt.Sprintf("sudo %s", cmd))
+	}
+	return cmds, nil
 }

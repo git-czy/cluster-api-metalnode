@@ -67,8 +67,14 @@ build: generate fmt vet ## Build manager binary.
 
 .PHONY: run
 run: install build ## Run a controller from your host.
+	go run ./main.go
+	#dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./bin/manager
+
+.PHONY: debug
+debug: install build ## Run a controller from your host.
 	#go run ./main.go
 	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./bin/manager
+
 
 .PHONY: docker-build
 docker-build: test ## Build docker image with the manager.

@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
-  name: metalnodes.metal.metal.node
+  name: metalnodes.bocloud.io
 spec:
-  group: metal.metal.node
+  group: bocloud.io
   names:
     kind: MetalNode
     listKind: MetalNodeList

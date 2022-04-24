@@ -2,7 +2,7 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: metalnodes.metal.metal.node
+  name: metalnodes.bocloud.io
 spec:
   conversion:
     strategy: Webhook

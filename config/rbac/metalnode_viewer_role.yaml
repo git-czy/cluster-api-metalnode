@@ -5,7 +5,7 @@ metadata:
   name: metalnode-viewer-role
 rules:
 - apiGroups:
-  - metal.metal.node
+  - bocloud.io
   resources:
   - metalnodes
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - metal.metal.node
+  - bocloud.io
   resources:
   - metalnodes/status
   verbs:

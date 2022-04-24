@@ -57,6 +57,8 @@ EOF
 __set_iptables
 
 __set_config() {
+  timedatectl set-timezone Asia/Shanghai
+  timedatectl set-local-rtc 0
   firewall-cmd --state
   systemctl stop firewalld.service
   systemctl disable firewalld.service
