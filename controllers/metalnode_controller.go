@@ -162,14 +162,14 @@ func (r *MetalNodeReconciler) initMetal(ctx context.Context, metalNode *v1beta1.
 	host := metalNodeToHost(metalNode)
 	cmd := remote.Command{
 		Cmds: []string{
-			//"sudo chmod +x /tmp/init_k8s_env.sh",
+			"sudo chmod +x /tmp/init_k8s_env.sh",
 			"sudo sed -i 's/\\r//g' /tmp/init_k8s_env.sh",
-			//"sudo /bin/bash /tmp/init_k8s_env.sh",
-			//"sudo hostnamectl set-hostname " + host[0].Address,
+			"sudo /bin/bash /tmp/init_k8s_env.sh",
+			"sudo hostnamectl set-hostname " + host[0].Address,
 		},
-		//FileUp: []remote.File{
-		//	{Src: "script/init_k8s_env.sh", Dst: "/tmp"},
-		//},
+		FileUp: []remote.File{
+			{Src: "script/init_k8s_env.sh", Dst: "/tmp"},
+		},
 	}
 
 	if metalNode.Spec.InitializationCmd != nil {
